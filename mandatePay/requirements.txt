@@ -1,0 +1,25 @@
+# Pinned to the exact versions the accepted build was validated against
+# (Windows, Python 3.13): 424 pytest tests, the 122-scenario evaluation, a
+# live OpenAI-compatible LLM run and a real Razorpay Test Mode payment.
+#
+# Direct dependencies only. Transitive packages (starlette, httpcore,
+# certifi, ...) are resolved by pip from these pins.
+
+# --- Application runtime ---
+fastapi==0.141.1
+uvicorn==0.52.4
+pydantic==2.13.5
+SQLAlchemy==2.0.52
+razorpay==2.0.1
+python-dotenv==1.2.3
+openai==3.6.0
+
+# --- Tests and the offline evaluation harness ---
+# Node/npm is NOT a runtime dependency. A handful of optional DOM tests
+# shell out to `node` if it happens to be installed and skip if it is not.
+pytest==9.1.1
+httpx==0.28.1
+# Imported directly by tests/conftest.py and evaluation/fakes.py, which
+# sever its transport so no test can reach a real provider. Pinned here
+# rather than relied on as a transitive dependency of razorpay.
+requests==2.34.2

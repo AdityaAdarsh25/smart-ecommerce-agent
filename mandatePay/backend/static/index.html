@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>MandatePay</title>
+<link rel="stylesheet" href="/static/app.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <span class="mark">MP</span>
+      <div>
+        <h1>MandatePay</h1>
+        <p class="tagline">Safe autonomous purchasing with deterministic transaction controls</p>
+      </div>
+    </div>
+    <nav class="topnav">
+      <a href="/docs" target="_blank" rel="noopener">API docs</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- The boundary, stated once, at the top. -->
+  <ol class="boundary" aria-label="How a purchase is decided">
+    <li><span class="who ai">AI</span> decides what the buyer appears to want</li>
+    <li><span class="who code">CODE</span> decides whether money may be spent</li>
+    <li><span class="who pay">RAZORPAY</span> executes the payment</li>
+  </ol>
+
+  <main class="layout">
+
+    <!-- ============ LEFT: identity + request ============ -->
+    <section class="col col-left">
+
+      <article class="card" id="buyer-card">
+        <header class="card-head">
+          <h2>1 &middot; Demo buyer</h2>
+          <span class="hint">seeded identity, not authentication</span>
+        </header>
+        <div class="card-body">
+          <label class="field">
+            <span>Buyer</span>
+            <select id="buyer-select"></select>
+          </label>
+          <div id="buyer-detail" class="mandate" hidden>
+            <div class="mandate-row"><span>Balance</span><b id="m-balance">&mdash;</b></div>
+            <div class="mandate-row"><span>Autonomous limit</span><b id="m-autonomous">&mdash;</b></div>
+            <div class="mandate-row"><span>Absolute maximum</span><b id="m-absolute">&mdash;</b></div>
+            <div class="mandate-row"><span>Monthly cap</span><b id="m-cap">&mdash;</b></div>
+            <div class="mandate-row"><span>Spent this month</span><b id="m-spent">&mdash;</b></div>
+            <div class="mandate-row wrapping"><span>Allowed categories</span><b id="m-categories">&mdash;</b></div>
+          </div>
+          <p id="buyer-empty" class="empty" hidden>
+            No seeded buyers found. Run <code>python createtables.py</code> then
+            <code>python seed_data.py</code>.
+          </p>
+        </div>
+      </article>
+
+      <article class="card" id="request-card">
+        <header class="card-head">
+          <h2>2 &middot; Buyer request</h2>
+          <span class="hint">natural language</span>
+        </header>
+        <div class="card-body">
+          <div id="presets" class="chips"></div>
+          <label class="field">
+            <span class="sr-only">Request</span>
+            <textarea id="request-input" rows="3"
+              placeholder="Get me a wireless keyboard under &#8377;3,000, preferably Logitech."></textarea>
+          </label>
+          <div class="actions">
+            <button id="submit-btn" class="btn btn-primary" type="button">Find &amp; Evaluate</button>
+            <button id="reset-btn" class="btn btn-ghost" type="button">Reset</button>
+          </div>
+          <p id="request-error" class="error" hidden></p>
+          <p id="agent-warning" class="warn" hidden></p>
+        </div>
+      </article>
+
+      <article class="card" id="evidence-card">
+        <header class="card-head">
+          <h2>Safety evidence</h2>
+          <span class="hint">from evaluation/results.json</span>
+        </header>
+        <div class="card-body">
+          <div id="evidence-body" class="evidence">
+            <p class="empty">Loading evaluation results&hellip;</p>
+          </div>
+        </div>
+      </article>
+
+    </section>
+
+    <!-- ============ RIGHT: the decision pipeline ============ -->
+    <section class="col col-right">
+
+      <p id="pipeline-empty" class="placeholder">
+        Pick a buyer, describe a purchase, and the AI selection, the server quote,
+        the deterministic policy verdict and the audit trail appear here.
+      </p>
+
+      <!-- AI selection -->
+      <article class="card" id="ai-card" hidden>
+        <header class="card-head">
+          <h2>3 &middot; AI selection</h2>
+          <span class="badge badge-ai">AI &mdash; advisory only</span>
+        </header>
+        <div class="card-body">
+          <p class="note">
+            The model read the sentence and nominated a product. It authorised no
+            spend and set no amount.
+          </p>
+          <div id="intent-grid" class="kv"></div>
+          <div id="selection-block" hidden>
+            <h3 class="sub">Selected product</h3>
+            <div class="product">
+              <div>
+                <b id="sel-name">&mdash;</b>
+                <div class="muted" id="sel-meta">&mdash;</div>
+              </div>
+              <div class="price" id="sel-price">&mdash;</div>
+            </div>
+            <p class="rationale" id="sel-rationale"></p>
+            <p class="muted small" id="sel-eligible"></p>
+          </div>
+          <ul id="agent-notes" class="notes" hidden></ul>
+        </div>
+      </article>
+
+      <!-- Clarification / unsupported / no match -->
+      <article class="card card-amber" id="clarify-card" hidden>
+        <header class="card-head">
+          <h2 id="clarify-title">Clarification required</h2>
+          <span class="badge badge-amber" id="clarify-badge">CLARIFY</span>
+        </header>
+        <div class="card-body">
+          <p class="lead" id="clarify-message"></p>
+          <p class="muted small">
+            Nothing was priced and no transaction exists. There is no payment path
+            from this state.
+          </p>
+        </div>
+      </article>
+
+      <!-- Quote -->
+      <article class="card" id="quote-card" hidden>
+        <header class="card-head">
+          <h2>4 &middot; Server quote</h2>
+          <span class="badge badge-code">CODE &mdash; server authoritative</span>
+        </header>
+        <div class="card-body">
+          <div class="quote-grid">
+            <div><span>Product</span><b id="q-product">&mdash;</b></div>
+            <div><span>Quantity</span><b id="q-quantity">&mdash;</b></div>
+            <div><span>Unit price</span><b id="q-unit">&mdash;</b></div>
+            <div><span>Total</span><b class="total" id="q-total">&mdash;</b></div>
+            <div><span>Status</span><b id="q-status">&mdash;</b></div>
+            <div><span>Expires</span><b id="q-expiry">&mdash;</b></div>
+          </div>
+          <p class="muted small mono" id="q-id"></p>
+          <p class="note">
+            Read from the product row when the quote was persisted. No value here
+            came from the model or from this browser.
+          </p>
+        </div>
+      </article>
+
+      <!-- Policy -->
+      <article class="card" id="policy-card" hidden>
+        <header class="card-head">
+          <h2>5 &middot; Deterministic policy</h2>
+          <span class="badge badge-code">CODE</span>
+        </header>
+        <div class="card-body">
+          <div class="verdict" id="verdict">
+            <span class="verdict-badge" id="verdict-badge">&mdash;</span>
+            <p class="verdict-summary" id="verdict-summary"></p>
+          </div>
+          <div id="policy-findings"></div>
+          <details class="details" id="policy-rules-wrap">
+            <summary>Rules evaluated</summary>
+            <ul class="rules" id="policy-rules"></ul>
+          </details>
+          <div class="mandate-context">
+            <h3 class="sub">Mandate context</h3>
+            <div class="ctx" id="policy-context"></div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Approval / payment -->
+      <article class="card" id="action-card" hidden>
+        <header class="card-head">
+          <h2>6 &middot; Approval &amp; payment</h2>
+          <span class="badge" id="action-badge">&mdash;</span>
+        </header>
+        <div class="card-body">
+          <p class="lead" id="action-lead"></p>
+          <div class="actions" id="action-buttons"></div>
+          <p id="action-error" class="error" hidden></p>
+          <div class="status-line" id="payment-status" hidden>
+            <span class="status-badge" id="payment-badge">&mdash;</span>
+            <span id="payment-detail"></span>
+          </div>
+          <div class="txn" id="txn-detail" hidden>
+            <div><span>Transaction status</span><b id="t-status">&mdash;</b></div>
+            <div><span>Amount</span><b id="t-amount">&mdash;</b></div>
+            <div><span>Razorpay order</span><b class="mono" id="t-order">&mdash;</b></div>
+            <div><span>Razorpay payment</span><b class="mono" id="t-payment">&mdash;</b></div>
+          </div>
+          <p class="muted small" id="action-footnote"></p>
+        </div>
+      </article>
+
+      <!-- Audit -->
+      <article class="card" id="audit-card" hidden>
+        <header class="card-head">
+          <h2>7 &middot; Audit trail</h2>
+          <span class="hint" id="audit-count"></span>
+        </header>
+        <div class="card-body">
+          <p class="note">
+            Append-only. Every entry below was written as it happened, by the code
+            that performed the step.
+          </p>
+          <ol class="timeline" id="timeline"></ol>
+        </div>
+      </article>
+
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>
+      Buildathon demo. Authentication is intentionally out of scope &mdash; a seeded
+      buyer identity is selected rather than authenticated, so the submission stays
+      focused on delegated spending safety. Razorpay runs in Test Mode.
+    </p>
+  </footer>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="/static/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+{
+  "generated_at": "2026-09-02T11:42:51+00:00",
+  "network": {
+    "live_calls_made": 0,
+    "guards_installed": [
+      "requests.Session.request/send",
+      "httpx.HTTPTransport.handle_request",
+      "httpx.AsyncHTTPTransport.handle_async_request",
+      "httpx2.HTTPTransport.handle_request",
+      "httpx2.AsyncHTTPTransport.handle_async_request",
+      "llm_client.complete_json"
+    ]
+  },
+  "totals": {
+    "scenarios": 122,
+    "passed": 122,
+    "failed": 0,
+    "pass_rate": 100.0
+  },
+  "unsafe_financial_bypass": {
+    "count": 0,
+    "scenarios_with_bypass_checks": 65,
+    "rate_over_all_scenarios": 0.0,
+    "rate_over_guarded_scenarios": 0.0,
+    "scenario_ids": [],
+    "findings": {}
+  },
+  "by_group": {
+    "policy_mandate": {
+      "total": 24,
+      "passed": 24,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "quote_price_stock": {
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "duplicates": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "approval": {
+      "total": 16,
+      "passed": 16,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "ai_intent_selection": {
+      "total": 22,
+      "passed": 22,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "payment": {
+      "total": 18,
+      "passed": 18,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "adversarial_catalogue": {
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    }
+  },
+  "by_metric": {
+    "policy_decision_correctness": {
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "hard_block_correctness": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "approval_escalation_correctness": {
+      "total": 11,
+      "passed": 11,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "approval_revalidation_correctness": {
+      "total": 8,
+      "passed": 8,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "quote_integrity": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "price_drift_detection": {
+      "total": 4,
+      "passed": 4,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "duplicate_protection_correctness": {
+      "total": 12,
+      "passed": 12,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "payment_state_correctness": {
+      "total": 18,
+      "passed": 18,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "clarification_selection_correctness": {
+      "total": 20,
+      "passed": 20,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    },
+    "adversarial_bypass_resistance": {
+      "total": 14,
+      "passed": 14,
+      "failed": 0,
+      "failed_ids": [],
+      "pass_rate": 100.0
+    }
+  },
+  "failed_scenario_ids": [],
+  "failures": []
+}

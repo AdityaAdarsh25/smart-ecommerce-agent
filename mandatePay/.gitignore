@@ -1,0 +1,21 @@
+# Secrets -- never commit
+.env
+
+# Virtualenv
+.venv/
+venv/
+
+# Python bytecode / caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Local databases (dev fixtures, recreate with createtables.py + seed_data.py)
+*.db
+*.db.bak
+*.sqlite3
+
+# Test / tooling caches
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
